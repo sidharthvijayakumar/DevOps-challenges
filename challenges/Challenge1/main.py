@@ -1,3 +1,5 @@
+import os
+
 import psutil
 
 def disk_usage(path):
@@ -7,6 +9,10 @@ def disk_usage(path):
     print(f"Total free disk space on the device is: {hdd.free//1024**3} GiB")
     print(f"Total used disk space on the device is: {hdd.used//1024**3} GiB")
     print(f"Total percentage free disk space on the device is: {hdd.free/hdd.total*100:.2f} %")
+
+def process_running():
+    for proc in psutil.process_iter(['pid', 'name', 'username']):
+        print(proc.info)
 
 
 if __name__ == "__main__":
@@ -21,3 +27,5 @@ if __name__ == "__main__":
     user_input = input(menu_text + "\n")
     if int(user_input) ==1:
         disk_usage('/')
+    elif int(user_input) == 2:
+        process_running()
