@@ -1,7 +1,9 @@
 import os
+import sys
 
 import psutil
 import logging
+import datetime
 
 logging.basicConfig(
     filename="system_health.log",
@@ -14,7 +16,7 @@ def disk_usage(path,file_name):
         hdd = psutil.disk_usage(path)
         with open(file_name, "a") as f:
             f.write("******************DISK USAGE************************\n")
-            f.write(f"Total disk space on the device is: {str(hdd.total//1024**3)} GiB\n")
+            f.write(f"Total disk space on the device is: {(hdd.total//1024**3)} GiB\n")
             f.write(f"Total free disk space on the device is: {hdd.free//1024**3} GiB\n")
             f.write(f"Total used disk space on the device is: {hdd.used//1024**3} GiB\n")
             f.write(f"Total percentage free disk space on the device is: {hdd.percent:.2f} %\n")
@@ -55,6 +57,9 @@ def process_running(file_name):
 
 
 if __name__ == "__main__":
+    timeStamp=datetime.datetime.utcnow().isoformat()
+    file_name=f"Systemhealth-{timeStamp}.txt"
+    print(f"Processing {file_name}")
     menu_text = """Select which menu you would like to use:
     ************************************************
     1. Check the disk usage
@@ -65,7 +70,7 @@ if __name__ == "__main__":
     try:
         choice = input(menu_text + "\n")
         if int(choice) ==1:
-            disk_usage('/',"Systemhealth.txt")
+            disk_usage('/',file_name)
         elif int(choice) == 2:
             process_running("Systemhealth.txt")
         else:
