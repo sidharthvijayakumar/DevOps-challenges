@@ -1,4 +1,4 @@
-name: "challnge-2-opentofu"
+name: "challenge-2-opentofu"
 
 on:
   workflow_dispatch:
