@@ -1,2 +1,4 @@
 System*
 system*
+*tfstate*
+*.terraform*
