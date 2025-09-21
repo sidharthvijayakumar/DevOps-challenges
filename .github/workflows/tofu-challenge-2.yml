@@ -5,7 +5,7 @@ on:
 
 defaults:
   run:
-    working-directory: ./Challege2
+    working-directory: ./challenges/Challenge2
 jobs:
   tofu-job:
     runs-on: ubuntu-latest
