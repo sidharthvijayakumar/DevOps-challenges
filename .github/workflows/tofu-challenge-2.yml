@@ -5,13 +5,14 @@ on:
 
 defaults:
   run:
-    working-directory: ./Challege2
+    working-directory: ./challenges/Challenge2
 jobs:
   tofu-job:
     runs-on: ubuntu-latest
     permissions:
       id-token: write   # This is required for requesting the JWT
       contents: read    # This is required for actions/checkout
+      issues: write     # <-- needed by manual-approval
     steps:
       - uses: actions/checkout@v5
       - name: Configure AWS credentials
@@ -22,14 +23,14 @@ jobs:
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
       - uses: opentofu/setup-opentofu@v1
         with:
-            tofu_version: 1.6.0
+            tofu_version: 1.10.0
       - name: OpenTofu fmt
         id: fmt
         run: tofu fmt -check
         continue-on-error: true
 
       - name: Initialise Opentofu
-        run: opentofu init
+        run: tofu init
 
       - name: OpenTofu Validate
         id: validate
@@ -38,10 +39,23 @@ jobs:
       - name: OpenTofu Plan
         id: plan
         run: tofu plan -no-color
-        continue-on-error: true
 
-      - name: OpenTofu Plan
+      - uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: sidharthvijayakumar
+          minimum-approvals: 1
+          issue-title: "Deploying v1.3.5 to prod from staging"
+          issue-body: "Please approve or deny the deployment of version v1.3.5."
+          fail-on-denial: true
+          additional-approved-words: 'approved'
+
+      # - name: OpenTofu apply
+      #   id: apply
+      #   run: tofu apply --auto-approve
+      #   continue-on-error: true
+      - name: OpenTofu destroy
         id: apply
-        run: tofu apply --auto-approve
+        run: tofu destroy --auto-approve
         continue-on-error: true
 
