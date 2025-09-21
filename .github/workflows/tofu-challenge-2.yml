@@ -50,9 +50,12 @@ jobs:
           fail-on-denial: true
           additional-approved-words: 'approved'
 
-
-      - name: OpenTofu apply
+      # - name: OpenTofu apply
+      #   id: apply
+      #   run: tofu apply --auto-approve
+      #   continue-on-error: true
+      - name: OpenTofu destroy
         id: apply
-        run: tofu apply --auto-approve
+        run: tofu destroy --auto-approve
         continue-on-error: true
 
