@@ -13,7 +13,7 @@ Goal: Provision an Nginx web server on AWS EC2 using Terraform, and automate its
 ⸻
 
 2️⃣ GitLab CI/CD
-	•	Create a .gitlab-ci.yml file with:
+	•	Create a .gitlab-ci.yml/Github action file with:
 	•	A job to run terraform init, plan, and apply.
 	•	Use an S3 backend (or local backend if you don’t have S3).
 	•	Make sure the apply step requires manual approval.
