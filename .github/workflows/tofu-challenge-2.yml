@@ -1,0 +1,47 @@
+name: "challenge-2-opentofu"
+
+on:
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: ./Challege2
+jobs:
+  tofu-job:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # This is required for requesting the JWT
+      contents: read    # This is required for actions/checkout
+    steps:
+      - uses: actions/checkout@v5
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::772287923857:role/open-tofu-iam-role # this should match aws role arn
+          aws-region: ap-south-1
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+      - uses: opentofu/setup-opentofu@v1
+        with:
+            tofu_version: 1.6.0
+      - name: OpenTofu fmt
+        id: fmt
+        run: tofu fmt -check
+        continue-on-error: true
+
+      - name: Initialise Opentofu
+        run: opentofu init
+
+      - name: OpenTofu Validate
+        id: validate
+        run: tofu validate -no-color
+    
+      - name: OpenTofu Plan
+        id: plan
+        run: tofu plan -no-color
+        continue-on-error: true
+
+      - name: OpenTofu Plan
+        id: apply
+        run: tofu apply --auto-approve
+        continue-on-error: true
+
