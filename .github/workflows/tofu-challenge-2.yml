@@ -38,9 +38,21 @@ jobs:
       - name: OpenTofu Plan
         id: plan
         run: tofu plan -no-color
-        continue-on-error: true
 
-      - name: OpenTofu Plan
+      - uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: user1,user2,org-team1
+          minimum-approvals: 1
+          issue-title: "Deploying v1.3.5 to prod from staging"
+          issue-body: "Please approve or deny the deployment of version v1.3.5."
+          issue-body-file-path: relative/file_path/wrt/repo/root
+          exclude-workflow-initiator-as-approver: false
+          fail-on-denial: true
+          additional-approved-words: ''
+          additional-denied-words: ''
+
+      - name: OpenTofu apply
         id: apply
         run: tofu apply --auto-approve
         continue-on-error: true
