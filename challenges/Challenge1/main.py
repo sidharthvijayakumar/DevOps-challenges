@@ -1,5 +1,6 @@
 import os
 import sys
+from logging import exception
 
 import psutil
 import logging
@@ -37,7 +38,6 @@ def disk_usage(path,file_name):
 
 def process_running(file_name):
     try:
-
         with open(file_name,"a") as f:
             f.write("******************PROCESS RUNNING************************\n")
             for proc in psutil.process_iter(['pid', 'name', 'username']):
@@ -55,6 +55,14 @@ def process_running(file_name):
         logging.error(f"Unexpected error: {error}")
         print(f"Unexpected error: {error}")
 
+def memory_info (file_name):
+    try:
+        with open(file_name,"a") as f:
+            f.write("******************MEMORY INFO************************\n")
+            mem = psutil.virtual_memory()
+    except Exception as error:
+        logging.error(f"psutil error while reading memory stats: {error}")
+        print(f"Could not retrieve memory stats: {error}")
 
 if __name__ == "__main__":
     timeStamp=datetime.datetime.utcnow().isoformat()
@@ -73,6 +81,8 @@ if __name__ == "__main__":
             disk_usage('/',file_name)
         elif int(choice) == 2:
             process_running("Systemhealth.txt")
+        elif int(choice) == 3:
+            memory_info("Systemhealth.txt")
         else:
             raise Exception
     except Exception as error:
