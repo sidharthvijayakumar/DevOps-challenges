@@ -1,5 +1,6 @@
 import os
 import sys
+from logging import exception
 
 import psutil
 import logging
@@ -37,7 +38,6 @@ def disk_usage(path,file_name):
 
 def process_running(file_name):
     try:
-
         with open(file_name,"a") as f:
             f.write("******************PROCESS RUNNING************************\n")
             for proc in psutil.process_iter(['pid', 'name', 'username']):
@@ -55,9 +55,27 @@ def process_running(file_name):
         logging.error(f"Unexpected error: {error}")
         print(f"Unexpected error: {error}")
 
+def memory_info (file_name):
+    try:
+        with open(file_name,"a") as f:
+            mem = psutil.virtual_memory()
+            f.write("******************MEMORY INFO************************\n")
+            f.write(f"Total space on the device is: {(mem.total//1024**3)} GiB\n")
+            f.write(f"Memory available on the device is: {(mem.available//1024**3)} GiB\n")
+            f.write(f"Used memory on the device is: {(mem.used//1024**3)} GiB\n")
+            f.write(f"Memory percentage on this device is: {mem.percent} %\n")
+            f.write("******************MEMORY INFO************************\n")
+        with open(file_name,"r") as r:
+            print(r.read())
+    except FileNotFoundError as error:
+        logging.error(f"Unable to find : {error}")
+        print(f"Could not retrieve process stats: {error}")
+    except Exception as error:
+        logging.error(f"psutil error while reading memory stats: {error}")
+        print(f"Could not retrieve memory stats: {error}")
 
 if __name__ == "__main__":
-    timeStamp=datetime.datetime.utcnow().isoformat()
+    timeStamp=datetime.datetime.utcnow()
     file_name=f"Systemhealth-{timeStamp}.txt"
     print(f"Processing {file_name}")
     menu_text = """Select which menu you would like to use:
@@ -69,10 +87,12 @@ if __name__ == "__main__":
     ************************************************"""
     try:
         choice = input(menu_text + "\n")
-        if int(choice) ==1:
+        if int(choice) == 1:
             disk_usage('/',file_name)
         elif int(choice) == 2:
-            process_running("Systemhealth.txt")
+            process_running(file_name)
+        elif int(choice) == 3:
+            memory_info(file_name)
         else:
             raise Exception
     except Exception as error:
