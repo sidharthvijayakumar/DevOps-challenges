@@ -1,4 +1,4 @@
-name: "challenge-2-opentofu"
+name: "challenge-2-opentofu-destroy"
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ defaults:
   run:
     working-directory: ./challenges/Challenge2
 jobs:
-  tofu-job:
+  tofu-destroy-job:
     runs-on: ubuntu-latest
     permissions:
       id-token: write   # This is required for requesting the JWT
@@ -45,15 +45,11 @@ jobs:
           secret: ${{ github.TOKEN }}
           approvers: sidharthvijayakumar
           minimum-approvals: 1
-          issue-title: "Deploying v1.3.5 to prod from staging"
-          issue-body: "Please approve or deny the deployment of version v1.3.5."
+          issue-title: "Destroy resource created by Opentofu"
+          issue-body: "Please approve or deny the tofu pipeline"
           fail-on-denial: true
           additional-approved-words: 'approved'
 
-      # - name: OpenTofu apply
-      #   id: apply
-      #   run: tofu apply --auto-approve
-      #   continue-on-error: true
       - name: OpenTofu destroy
         id: apply
         run: tofu destroy --auto-approve
