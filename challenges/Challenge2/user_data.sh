@@ -1,7 +1,6 @@
 #!/bin/bash
 sudo yum update
 sudo yum install nginx -y
-sudo systemctl enable nginx.service
 sudo yum install telnet -y
 sudo tee /usr/share/nginx/html/index.html > /dev/null <<'EOF'
 <!DOCTYPE html>
@@ -37,4 +36,30 @@ sudo tee /usr/share/nginx/html/index.html > /dev/null <<'EOF'
 </body>
 </html>
 EOF
+#Enable and start State nginx service
+sudo systemctl enable nginx.service
 sudo systemctl start nginx.service
+#Install cloudwatch agent
+sudo yum install amazon-cloudwatch-agent -y
+#Enable and state cloud watch agent
+sudo systemctl enable amazon-cloudwatch-agent
+sudo systemctl start amazon-cloudwatch-agent
+
+#Check the system arch
+ARCH=$(uname -m)
+
+if [ "$ARCH" = "x86_64" ]; then
+    echo "Installing package for x86_64"
+    #Instal ssm agent for x86
+    sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm 
+   # Install cloud watch agent
+elif [ "$ARCH" = "aarch64" ]; then
+    echo "Installing package for ARM64"
+    #Install ssm agent for arm
+    sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_arm64/amazon-ssm-agent.rpm
+else
+    echo "Unknown architecture: $ARCH"
+fi
+#Enable and start the ssm
+systemctl enable amazon-ssm-agent
+systemctl start amazon-ssm-agent

@@ -15,5 +15,9 @@ output "ec2_instance_id" {
 
 output "ec2_instance_ip" {
   description = "Ip address of the instance"
-  value       = module.ec2_instance.public_ip 
+  value       = module.ec2_instance.public_ip
+}
+output "topic_arn" {
+  description = "The ARN of the SNS topic, as a more obvious property (clone of id)"
+  value       = module.sns.topic_arn
 }
