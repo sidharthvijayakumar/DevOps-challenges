@@ -1,0 +1,58 @@
+name: "challenge-2-opentofu-create"
+
+on:
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: ./challenges/Challenge2
+jobs:
+  tofu-create-job:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # This is required for requesting the JWT
+      contents: read    # This is required for actions/checkout
+      issues: write     # <-- needed by manual-approval
+    steps:
+      - uses: actions/checkout@v5
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::772287923857:role/open-tofu-iam-role # this should match aws role arn
+          aws-region: ap-south-1
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+      - uses: opentofu/setup-opentofu@v1
+        with:
+            tofu_version: 1.10.0
+      - name: OpenTofu fmt
+        id: fmt
+        run: tofu fmt -check
+        continue-on-error: true
+
+      - name: Initialise Opentofu
+        run: tofu init
+
+      - name: OpenTofu Validate
+        id: validate
+        run: tofu validate -no-color
+    
+      - name: OpenTofu Plan
+        id: plan
+        run: tofu plan -no-color
+
+      - uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: sidharthvijayakumar
+          minimum-approvals: 1
+          issue-title: "Create AWS resource using Opentofu"
+          issue-body: "Please approve or deny the tofu pipeline"
+          fail-on-denial: true
+          additional-approved-words: 'approved'
+
+      - name: OpenTofu apply
+        id: apply
+        run: tofu apply --auto-approve
+        continue-on-error: true
+
+
