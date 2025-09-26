@@ -12,7 +12,8 @@ Every week, I tackle a new hands-on challenge focused on:
 - Docker & containerization
 - CI/CD & automation
 - Infrastructure as Code (Terraform, OpenTofu, etc.)
-- Kubernetes, AWS, and other DevOps tools
+- Kubernetes ,Helm ,AWS, and other DevOps tools
+- Python/Shell script
 
 Each challenge is designed to sharpen my real-world problem-solving skills while building a portfolio of reusable examples.
 
@@ -22,11 +23,16 @@ Each challenge is designed to sharpen my real-world problem-solving skills while
 
 ```text
 .
-├── DevOps-challenges/
-│   ├── 2025-09-19-docker-basics/
-│   │   ├── README.md      # Problem statement & notes
-│   │   ├── solution/      # Code, scripts, configs
-│   │   └── screenshots/
-│   ├── 2025-09-26-ci-cd/
-│   └── ...
-└── README.md
+## 📂 Repository Structure
+
+```bash
+DevOps-challenges/
+├── challenges/
+│   ├── Challenge1/
+│   │   └── README.md
+│   ├── Challenge2/
+│   │   └── README.md
+│   ├── Challenge3/
+│   │   └── README.md
+│   └── ... (future challenges)
+├── README.md
