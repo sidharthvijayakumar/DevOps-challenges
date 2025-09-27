@@ -41,11 +41,12 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/late
 
 #Once this is running we will need to edit the deployment
 sidharth@Sidharths-MacBook-Air Challenge3 % k get po -n kube-system| grep metrics-server
-
+ 
 #Add the below line
 - --kubelet-insecure-tls
 
 #Sample:
+
 containers:
 - name: metrics-server
   image: registry.k8s.io/metrics-server/metrics-server:v0.8.0
@@ -55,9 +56,72 @@ containers:
     - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
     - --kubelet-insecure-tls
 
+#Install ingress controller
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
 
+#Edit the svc of the ingress controller
+k get svc -n ingress-nginx
+
+#Update the below lines and ensure Type: NodePort
+  ports:
+  - appProtocol: http
+    name: http
+    nodePort: 30080
+    port: 80
+    protocol: TCP
+    targetPort: http
+  - appProtocol: https
+    name: https
+    nodePort: 30443
+    port: 443
+    protocol: TCP
+    targetPort: https
+  selector:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+  sessionAffinity: None
+  type: NodePort
 ```
+---
+## How to access the app
+1. Portforward:
 
+k port-forward svc/app-python-flask 8080:80
+
+Once this is running open http://localhost:8080 and http://localhost:8080
+![img.png](img.png)
+![img_1.png](img_1.png)
+
+2. Ingress controler
+
+#Add this path to /etc/hosts
+# To allow the same kube context to work on the host and the container:
+127.0.0.1   flask.app
+
+Once this is done access http://flask.app:30080 this port is exposed by the kind cluster
+which will help to route traffic you can also curl
+
+(venv) sidharth@Sidharths-MacBook-Air Challenge3 % curl -kv http://flask.app:30080/
+* Host flask.app:30080 was resolved.
+* IPv6: (none)
+* IPv4: 127.0.0.1
+*   Trying 127.0.0.1:30080...
+* Connected to flask.app (127.0.0.1) port 30080
+> GET / HTTP/1.1
+> Host: flask.app:30080
+> User-Agent: curl/8.7.1
+> Accept: */*
+> 
+* Request completely sent off
+< HTTP/1.1 200 OK
+< Date: Sat, 27 Sep 2025 18:27:16 GMT
+< Content-Type: text/html; charset=utf-8
+< Content-Length: 27
+< Connection: keep-alive
+< 
+* Connection #0 to host flask.app left intact
+Simple hello world program!%             
 ---
 
 ## 3️⃣ Monitoring Stack
