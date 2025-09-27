@@ -91,40 +91,23 @@ k get svc -n ingress-nginx
 k port-forward svc/app-python-flask 8080:80
 
 Once this is running open http://localhost:8080 and http://localhost:8080
-![img_2.png](img_2.png)
-![img_3.png](img_3.png)
 
 2. Ingress controler
-
-```
-
 #Add this path to /etc/hosts
+
 # To allow the same kube context to work on the host and the container:
 127.0.0.1   flask.app
 
+#Access the application on http://flask.app:30080/
+curl -kv http://flask.app:30080/
+
+```
+![img_2.png](img_2.png)
+![img_3.png](img_3.png)
+
 Once this is done access http://flask.app:30080 this port is exposed by the kind cluster
 which will help to route traffic you can also curl
-
-(venv) sidharth@Sidharths-MacBook-Air Challenge3 % curl -kv http://flask.app:30080/
-* Host flask.app:30080 was resolved.
-* IPv6: (none)
-* IPv4: 127.0.0.1
-*   Trying 127.0.0.1:30080...
-* Connected to flask.app (127.0.0.1) port 30080
-> GET / HTTP/1.1
-> Host: flask.app:30080
-> User-Agent: curl/8.7.1
-> Accept: */*
-> 
-* Request completely sent off
-< HTTP/1.1 200 OK
-< Date: Sat, 27 Sep 2025 18:27:16 GMT
-< Content-Type: text/html; charset=utf-8
-< Content-Length: 27
-< Connection: keep-alive
-< 
-* Connection #0 to host flask.app left intact
-Simple hello world program!%             
+ 
 ---
 
 ## 3️⃣ Monitoring Stack
