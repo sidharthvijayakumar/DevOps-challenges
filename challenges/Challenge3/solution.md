@@ -87,13 +87,16 @@ k get svc -n ingress-nginx
 ## How to access the app
 1. Portforward:
 
+```commandline
 k port-forward svc/app-python-flask 8080:80
 
 Once this is running open http://localhost:8080 and http://localhost:8080
-![img.png](img.png)
-![img_1.png](img_1.png)
+![img_2.png](img_2.png)
+![img_3.png](img_3.png)
 
 2. Ingress controler
+
+```
 
 #Add this path to /etc/hosts
 # To allow the same kube context to work on the host and the container:
