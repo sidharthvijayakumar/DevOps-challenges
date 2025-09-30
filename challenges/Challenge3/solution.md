@@ -111,12 +111,13 @@ which will help to route traffic you can also curl
 ---
 
 ## 3️⃣ Monitoring Stack
-- Deploy **Prometheus + Grafana** via Helm charts.
-- Expose Grafana on a NodePort so you can open it in your browser.
-- Configure Prometheus to scrape metrics from your Flask app:
-  - Use the `prometheus_client` Python library
-  - Expose metrics at `/metrics`
+This was deployed using opentofu module from Opentofu repository
 
+Once this is done we can perform load testing using:
+
+```commandline
+hey -n 450000 http://flask.app:30080/health
+```
 ---
 
 ## 4️⃣ Alerting
