@@ -122,27 +122,10 @@ hey -n 450000 http://flask.app:30080/health
 
 ## 4️⃣ Alerting
 - Create a **Prometheus alert rule**:  
-  This alert was created in Grafana for 20% cpu utilisation cause
-  it was hard to hit 70% utilisation.The contact point was set as discord channel
+  This alert was created in Grafana for 20% cpu utilisation cause it was hard to hit 70% utilisation.The contact point was
+  set as discord channel
 - Once the alert is violated for 2mins or more it will fire notification to discord channel
-- ![img_6.png](img_6.png)
--![img_4.png](img_4.png)
-- ![img_5.png](img_5.png)
-
----
-
-## 5️⃣ Bonus (Optional 🌟)
-- Add **Grafana dashboards** to visualize requests hitting your Flask app.
-- Deploy an **Ingress Controller** (nginx ingress) instead of NodePort.
-- Push your Docker image to **DockerHub** and pull it in your K8s manifests.
-- Write a **Makefile** with shortcuts:  
-  - `make build` → build Docker image  
-  - `make deploy` → deploy to K8s  
-  - `make monitor` → run monitoring script  
-
----
-
-## ✅ Verification
-1. Deploy the app and send test traffic:
-   ```bash
-   curl http://<service-ip>:<port>/healthz
+- ![img_7.png](img_7.png)
+- ![img_8.png](img_8.png)
+- ![img_9.png](img_9.png)
+- ![img_10.png](img_10.png)
