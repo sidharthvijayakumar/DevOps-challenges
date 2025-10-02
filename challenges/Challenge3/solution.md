@@ -41,11 +41,12 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/late
 
 #Once this is running we will need to edit the deployment
 sidharth@Sidharths-MacBook-Air Challenge3 % k get po -n kube-system| grep metrics-server
-
+ 
 #Add the below line
 - --kubelet-insecure-tls
 
 #Sample:
+
 containers:
 - name: metrics-server
   image: registry.k8s.io/metrics-server/metrics-server:v0.8.0
@@ -55,45 +56,76 @@ containers:
     - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
     - --kubelet-insecure-tls
 
+#Install ingress controller
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+
+#Edit the svc of the ingress controller
+k get svc -n ingress-nginx
+
+#Update the below lines and ensure Type: NodePort
+  ports:
+  - appProtocol: http
+    name: http
+    nodePort: 30080
+    port: 80
+    protocol: TCP
+    targetPort: http
+  - appProtocol: https
+    name: https
+    nodePort: 30443
+    port: 443
+    protocol: TCP
+    targetPort: https
+  selector:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+  sessionAffinity: None
+  type: NodePort
+```
+---
+## How to access the app
+1. Portforward:
+
+```commandline
+k port-forward svc/app-python-flask 8080:80
+
+Once this is running open http://localhost:8080 and http://localhost:8080
+
+2. Ingress controler
+#Add this path to /etc/hosts
+
+# To allow the same kube context to work on the host and the container:
+127.0.0.1   flask.app
+
+#Access the application on http://flask.app:30080/
+curl -kv http://flask.app:30080/
 
 ```
+![img_2.png](img_2.png)
+![img_3.png](img_3.png)
 
+Once this is done access http://flask.app:30080 this port is exposed by the kind cluster
+which will help to route traffic you can also curl
+ 
 ---
 
 ## 3️⃣ Monitoring Stack
-- Deploy **Prometheus + Grafana** via Helm charts.
-- Expose Grafana on a NodePort so you can open it in your browser.
-- Configure Prometheus to scrape metrics from your Flask app:
-  - Use the `prometheus_client` Python library
-  - Expose metrics at `/metrics`
+This was deployed using opentofu module from Opentofu repository
 
+Once this is done we can perform load testing using:
+
+```commandline
+hey -n 450000 http://flask.app:30080/health
+```
 ---
 
 ## 4️⃣ Alerting
 - Create a **Prometheus alert rule**:  
-  Trigger if `http_requests_total` > 10 in 1 minute.
-- Write a **Python script** that:
-  - Polls Prometheus Alertmanager API
-  - Prints:  
-    ```bash
-    ALERT: High traffic
-    ```
-    when the alert is active.
-
----
-
-## 5️⃣ Bonus (Optional 🌟)
-- Add **Grafana dashboards** to visualize requests hitting your Flask app.
-- Deploy an **Ingress Controller** (nginx ingress) instead of NodePort.
-- Push your Docker image to **DockerHub** and pull it in your K8s manifests.
-- Write a **Makefile** with shortcuts:  
-  - `make build` → build Docker image  
-  - `make deploy` → deploy to K8s  
-  - `make monitor` → run monitoring script  
-
----
-
-## ✅ Verification
-1. Deploy the app and send test traffic:
-   ```bash
-   curl http://<service-ip>:<port>/healthz
+  This alert was created in Grafana for 20% cpu utilisation cause it was hard to hit 70% utilisation.The contact point was
+  set as discord channel
+- Once the alert is violated for 2mins or more it will fire notification to discord channel
+- ![img_7.png](img_7.png)
+- ![img_8.png](img_8.png)
+- ![img_9.png](img_9.png)
+- ![img_10.png](img_10.png)
