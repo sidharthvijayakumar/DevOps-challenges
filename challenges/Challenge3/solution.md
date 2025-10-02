@@ -122,14 +122,12 @@ hey -n 450000 http://flask.app:30080/health
 
 ## 4️⃣ Alerting
 - Create a **Prometheus alert rule**:  
-  Trigger if `http_requests_total` > 10 in 1 minute.
-- Write a **Python script** that:
-  - Polls Prometheus Alertmanager API
-  - Prints:  
-    ```bash
-    ALERT: High traffic
-    ```
-    when the alert is active.
+  This alert was created in Grafana for 20% cpu utilisation cause
+  it was hard to hit 70% utilisation.The contact point was set as discord channel
+- Once the alert is violated for 2mins or more it will fire notification to discord channel
+- ![img_6.png](img_6.png)
+-![img_4.png](img_4.png)
+- ![img_5.png](img_5.png)
 
 ---
 
