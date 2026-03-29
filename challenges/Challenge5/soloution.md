@@ -18,7 +18,7 @@ resources:
 ```
 Create a values.yaml file and then apply using that values.yaml file
 ```cmd
-helm install my-nginx bitnami/nginx --values values.yaml
+helm upgrade my-nginx bitnami/nginx --values values.yaml
 ```
 
 This is how the yaml would looks like:
@@ -143,4 +143,69 @@ my-nginx-5d9b6c49dc-7jjnd   1/1     Running             0          114s
 my-nginx-5d9b6c49dc-d72h9   1/1     Running             0          39s
 my-nginx-5d9b6c49dc-lgk2c   1/1     Running             0          77m
 my-nginx-5d9b6c49dc-lll2g   1/1     Running             0          6m9s
+```
+## Scenario 1:
+When cpu is not defined in values we get below error. Hence, HPA would not work
+
+```yaml
+sidharth@Sidharths-MacBook-Air Challenge5 % k get hpa    
+NAME       REFERENCE             TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+my-nginx   Deployment/my-nginx   <unknown>/80%   1         5         1          89m
+```
+## Scenario 2:
+If replicas is set to 3 then pod will use hpa min replica during the normal phase where there is no load.
+```yaml
+sidharth@Sidharths-MacBook-Air Challenge5 % k describe po| grep -i "replica"
+Controlled By:  ReplicaSet/my-nginx-574bd6fc4c
+```
+
+## Scenario 3:
+If we keep max replica in hpa to 3 its a max cap and it will not be able to scale further
+```yaml
+sidharth@Sidharths-MacBook-Air Challenge5 % k get hpa
+NAME       REFERENCE             TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+my-nginx   Deployment/my-nginx   1%/80%    1         3         1          99m
+```
+## Sceanrio 4:
+If metrics server itself is removed then hpa would have no understanding about how much is the current cpu utilization. Hence 
+
+```yaml
+sidharth@Sidharths-MacBook-Air Challenge5 % k get po -n kube-system
+NAME                                                READY   STATUS    RESTARTS   AGE
+coredns-76f75df574-h279n                            1/1     Running   0          4h23m
+coredns-76f75df574-tqwtk                            1/1     Running   0          4h23m
+etcd-single-node-control-plane                      1/1     Running   0          4h23m
+kindnet-b5856                                       1/1     Running   0          4h23m
+kube-apiserver-single-node-control-plane            1/1     Running   0          4h23m
+kube-controller-manager-single-node-control-plane   1/1     Running   0          4h23m
+kube-proxy-sfwwb                                    1/1     Running   0          4h23m
+kube-scheduler-single-node-control-plane            1/1     Running   0          4h23m
+metrics-server-6db6cd6674-hzng7                     1/1     Running   0          50m
+sidharth@Sidharths-MacBook-Air Challenge5 % k get po -n kube-system |grep -i "metrics"
+metrics-server-6db6cd6674-hzng7                     1/1     Running   0          50m
+
+sidharth@Sidharths-MacBook-Air Challenge5 % k get deploy -n kube-system
+NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+coredns          2/2     2            2           4h24m
+metrics-server   1/1     1            1           52m
+sidharth@Sidharths-MacBook-Air Challenge5 % k delete deploy metrics-server
+Error from server (NotFound): deployments.apps "metrics-server" not found
+sidharth@Sidharths-MacBook-Air Challenge5 % k delete deploy metrics-server -n kube-system
+deployment.apps "metrics-server" deleted
+```
+Check the hpa after deletting metrics server
+```yaml
+sidharth@Sidharths-MacBook-Air Challenge5 % k get hpa                                 
+NAME       REFERENCE             TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+my-nginx   Deployment/my-nginx   <unknown>/80%   1         3         1          101m
+```
+
+Again install metrics server
+```yaml
+sidharth@Sidharths-MacBook-Air Challenge5 % k get po -n kube-system |grep -i "metrics"
+metrics-server-6db6cd6674-r9n2r                     1/1     Running   0          25s
+
+sidharth@Sidharths-MacBook-Air Challenge5 % k get hpa
+NAME       REFERENCE             TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+my-nginx   Deployment/my-nginx   1%/80%    1         3         1          103m
 ```

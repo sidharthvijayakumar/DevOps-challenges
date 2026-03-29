@@ -458,7 +458,7 @@ customReadinessProbe: {}
 autoscaling:
   enabled: true
   minReplicas: 1
-  maxReplicas: 5
+  maxReplicas: 3
   targetCPU: 80
   targetMemory: ""
 ## @param extraVolumes Array to add extra volumes
