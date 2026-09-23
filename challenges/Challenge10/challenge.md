@@ -235,3 +235,30 @@ Try to solve the assignment yourself before searching for a complete solution.
 Do not use Python, Perl, or another scripting language.
 
 The goal is to practice Bash scripting.
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+printf "Backup Script......\n"
+
+printf "*************************************************\n"
+
+read -r -p "Enter the source directory: " source_dir
+
+printf "*************************************************\n"
+
+backup_dir="/backup"
+
+printf "Source directory is: ${source_dir} \n"
+
+printf "*************************************************\n"
+
+printf "Backup Directory is ${backup_dir}\n"
+
+printf "Starting backup process ...........\n"
+
+tar -cvf data-$(date +%F_%H%M%S).tar.gz ${source_dir}
+
+printf "zip file have been created \n"
+
+ls -lrtcha
